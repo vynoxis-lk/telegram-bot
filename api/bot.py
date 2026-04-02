@@ -1,21 +1,32 @@
 import os
-from telegram import Update
-from telegram.ext import Application, CommandHandler, ContextTypes
+import json
+from telegram import Bot, Update
 
 BOT_TOKEN = os.environ.get("BOT_TOKEN")
-
-app = Application.builder().token(BOT_TOKEN).build()
-
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("Hello! Bot is working 🚀")
-
-app.add_handler(CommandHandler("start", start))
+bot = Bot(token=BOT_TOKEN)
 
 async def handler(request):
-    data = await request.json()
-    update = Update.de_json(data, app.bot)
+    try:
+        data = await request.json()
+        update = Update.de_json(data, bot)
 
-    await app.initialize()
-    await app.process_update(update)
+        # Simple command handling
+        if update.message:
+            text = update.message.text
 
-    return {"statusCode": 200, "body": "ok"}
+            if text == "/start":
+                await bot.send_message(
+                    chat_id=update.message.chat_id,
+                    text="Bot is working on Vercel 🚀"
+                )
+
+        return {
+            "statusCode": 200,
+            "body": json.dumps({"ok": True})
+        }
+
+    except Exception as e:
+        return {
+            "statusCode": 500,
+            "body": str(e)
+        }
