@@ -10,15 +10,11 @@ async def handler(request):
         data = await request.json()
         update = Update.de_json(data, bot)
 
-        # Simple command handling
-        if update.message:
-            text = update.message.text
-
-            if text == "/start":
-                await bot.send_message(
-                    chat_id=update.message.chat_id,
-                    text="Bot is working on Vercel 🚀"
-                )
+        if update.message and update.message.text == "/start":
+            await bot.send_message(
+                chat_id=update.message.chat_id,
+                text="Bot is working 🚀"
+            )
 
         return {
             "statusCode": 200,
